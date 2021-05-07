@@ -139,9 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Date.h" />
+    <ClInclude Include="Flow.h" />
     <ClInclude Include="Info.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Date.cpp" />
+    <ClCompile Include="Flow.cpp" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
