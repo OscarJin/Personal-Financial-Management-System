@@ -21,10 +21,10 @@ int main()
 	My_Flow.find_tag(1);
 #endif
 
-//test system
+//main program
 #if 1
 	MANAGEMENT_SYSTEM System;
-
+	System.run();
 #endif
 	return 0;
 }
