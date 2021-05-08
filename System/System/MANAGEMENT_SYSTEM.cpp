@@ -114,12 +114,22 @@ void MANAGEMENT_SYSTEM::run()
 		system("cls");
 		info_manange();
 		break;
+	case 2:
+		system("cls");
+		add_bill();
+		break;
 	case 5:
 		save();
 		exit(0);
 	default:
 		break;
 	}
+}
+
+inline void MANAGEMENT_SYSTEM::_return()
+{
+	system("cls");
+	run();
 }
 
 void MANAGEMENT_SYSTEM::info_manange()
@@ -149,12 +159,62 @@ void MANAGEMENT_SYSTEM::info_manange()
 		info_manange();
 		break;
 	case 2:
-		cout << "Your balance is CNY" << personal_flow.get_Balance() << "." << endl;
+		Check_Password();
+		personal_flow.display_balance();
 		info_manange();
 		break;
 	case 3:
-		system("cls");
-		run();
+		_return();
+		break;
+	default:
+		break;
+	}
+}
+
+void MANAGEMENT_SYSTEM::add_bill()
+{
+	cout << "Please choose:" << endl;
+	cout << "1-Regular Bookkeeping" << endl;
+	cout << "2-Split the bill" << endl;
+	cout << "Caution: you may only split the bill of the latest three days!" << endl;
+	cout << "3-Return" << endl;
+	int opt2;
+	cin >> opt2;
+	Bill new_bill;
+	switch (opt2)
+	{
+	case 1:
+		cout << "You are adding a new bill now..." << endl;
+		cout << "Please choose: 0-Income\t1-Payment" << endl;
+		cin >> new_bill.io;
+		cout << "When you paid the bill? (in the format of \"YY MM DD\")" << endl;
+		cin >> new_bill.date.yy >> new_bill.date.mm >> new_bill.date.dd;
+		cout << "Where did your money come from/go?" << endl;
+		char _source;
+		_source = cin.get();
+		while ((_source = cin.get()) != '\n')
+			new_bill.source.push_back(_source);
+		cout << "Please enter the amount: " << endl;
+		cin >> new_bill.money;
+		cout << "Please choose your payment method (see the user manual for more information):" << endl;
+		cout << "0-Credit Card\t1-Debit Card\t2-Wechat Pay\t3-Alipay\t4-Cash" << endl;
+		cin >> new_bill.method;
+		cout << "Please add a tag: 0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other" << endl;
+		cin >> new_bill.tag_no;
+		cout << "Details(you may write anything!):" << endl;
+		char _detail;
+		_detail = cin.get();
+		while ((_detail = cin.get()) != '\n')
+			new_bill.detail.push_back(_detail);
+		Check_Password();
+		personal_flow.add(new_bill);
+		cout << "Success!" << endl;
+		save();
+		add_bill();
+		break;
+
+	case 3:
+		_return();
 		break;
 	default:
 		break;

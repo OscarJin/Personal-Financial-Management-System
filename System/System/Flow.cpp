@@ -2,7 +2,11 @@
 #include <iostream>
 #include <algorithm>
 #include <ctime>
+#include <iomanip>
 using namespace std;
+
+const string Flow::Payment_Method[5] = { "CREDIT CARD", "DEBIT CARD", "WECHAT PAY", "ALIPAY", "CASH" };
+const string Flow::Tag[7] = { "INCOME", "FOOD", "DAILY NECESSITIES", "EDUCATION", "ENTERTAINMENT", "TRANSPORTATION", "OTHER" };
 
 //NOTE: NO. DISPLAYED IS REAL+1!!!
 Flow::Flow()
@@ -27,47 +31,18 @@ void Flow::display(vector<Bill>::iterator it)
 	cout << it->source << endl;
 
 	cout << "AMOUNT: CNY" << it->money << endl;
-
-	cout << "PAYMENT METHOD: ";
-	switch (it->method)
-	{
-	case 1:
-		cout << "CREDIT CARD" << endl;
-		break;
-	case 2:
-		cout << "DEBIT CARD" << endl;
-		break;
-	case 3:
-		cout << "WECHAT PAY" << endl;
-		break;
-	case 4:
-		cout << "ALIPAY" << endl;
-		break;
-	case 5:
-		cout << "CASH" << endl;
-		break;
-	default:
-		break;
-	}
-
-	cout << "TAG: " << it->tag_no << endl;
+	cout << "PAYMENT METHOD: " << Payment_Method[it->method] << endl;
+	cout << "TAG: " << Tag[it->tag_no] << endl;
 	cout << "DETAILS: " << it->detail << endl;
 }
 
-void Flow::display_balance()
+inline void Flow::display_balance()
 {
-	cout << "BALANCE: CNY" << balance << endl;
+	cout << "BALANCE: CNY" << setiosflags(ios::fixed) << setprecision(2) << balance << endl;
 }
 
 void Flow::sort_date()
 {
-	/*struct
-	{
-		bool operator()(Bill b1, Bill b2)
-		{
-			return b1.date < b2.date;
-		}
-	}date_less;*/
 	sort(flow.begin(), flow.end(), [](Bill b1, Bill b2) {return b1.date < b2.date; });
 }
 

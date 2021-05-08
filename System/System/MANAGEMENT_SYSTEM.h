@@ -16,6 +16,9 @@ private:
 	bool Check_Password();
 	void init();
 	void save();
+
+	inline void _return();
 	void info_manange();
+	void add_bill();
 };
 

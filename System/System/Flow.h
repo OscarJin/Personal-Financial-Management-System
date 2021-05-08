@@ -11,7 +11,7 @@ struct Bill
 	Date date;		//when you pay/earn (YY/MM/DD)
 	string source;	//to whom you pay/who pay you
 	double money;	//how much you pay/earn
-	int method;		//payment method: 1-Credit Card 2-Debit Card 3-Wechat Pay 4-Alipay 5-Cash
+	int method;		//payment method: 0-Credit Card 1-Debit Card 2-Wechat Pay 3-Alipay 4-Cash
 	int tag_no;		
 	//number of tag_no: 0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other
 	string detail;	//why you pay/earn
@@ -32,12 +32,14 @@ public:
 	int get_Size();
 	double get_Balance();
 	void save(ofstream&);
+	inline void display_balance();
 	
 private:
+	static const string Payment_Method[5];
+	static const string Tag[7];
 	vector <Bill> flow;
 	double balance;
 	void display(vector<Bill>::iterator);
-	void display_balance();
 	//after each new bill/amendment on date, sort by date (before->now)
 	void sort_date();
 };
