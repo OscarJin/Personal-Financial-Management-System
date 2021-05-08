@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <fstream>
 #include "Date.h"
 using namespace std;
 
@@ -11,7 +12,8 @@ struct Bill
 	string source;	//to whom you pay/who pay you
 	double money;	//how much you pay/earn
 	int method;		//payment method: 1-Credit Card 2-Debit Card 3-Wechat Pay 4-Alipay 5-Cash
-	int tag_no;		//number of tag_no (default/defined by user)
+	int tag_no;		
+	//number of tag_no: 0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other
 	string detail;	//why you pay/earn
 };
 
@@ -26,6 +28,10 @@ public:
 	int find_tag(int);					//find by tag
 	void amend_tag(int, int);
 	void amend_detail(int, const string&);
+
+	int get_Size();
+	double get_Balance();
+	void save(ofstream&);
 	
 private:
 	vector <Bill> flow;

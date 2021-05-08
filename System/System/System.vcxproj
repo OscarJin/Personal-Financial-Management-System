@@ -142,12 +142,14 @@
     <ClInclude Include="Date.h" />
     <ClInclude Include="Flow.h" />
     <ClInclude Include="Info.h" />
+    <ClInclude Include="MANAGEMENT_SYSTEM.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Date.cpp" />
     <ClCompile Include="Flow.cpp" />
     <ClCompile Include="Info.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MANAGEMENT_SYSTEM.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

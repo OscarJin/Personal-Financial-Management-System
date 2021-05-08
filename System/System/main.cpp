@@ -1,10 +1,12 @@
 #include <iostream>
 #include "Info.h"
 #include "Flow.h"
+#include "MANAGEMENT_SYSTEM.h"
 using namespace std;
 
 int main()
 {
+//test flow
 #if 0
 	Flow My_Flow;
 	Bill b1 = {0, Date(21,4,1), "Father", 3000, 2, 1, "Pocket Money"};
@@ -17,6 +19,12 @@ int main()
 	My_Flow.find_month(Date(21, 4, 0));
 	system("cls");
 	My_Flow.find_tag(1);
+#endif
+
+//test system
+#if 1
+	MANAGEMENT_SYSTEM System;
+
 #endif
 	return 0;
 }

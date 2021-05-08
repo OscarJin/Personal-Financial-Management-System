@@ -183,3 +183,27 @@ void Flow::amend_detail(int i, const string& new_detail)
 {
 	flow[i - 1].detail = new_detail;
 }
+
+int Flow::get_Size()
+{
+	return flow.size();
+}
+
+double Flow::get_Balance()
+{
+	return balance;
+}
+
+void Flow::save(ofstream& rec)
+{
+	for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
+	{
+		rec << it->io << endl;
+		rec << it->date.yy << " " << it->date.mm << " " << it->date.dd << endl;
+		rec << it->source << endl;
+		rec << it->money << endl;
+		rec << it->method << endl;
+		rec << it->tag_no << endl;
+		rec << it->detail << endl;
+	}
+}
