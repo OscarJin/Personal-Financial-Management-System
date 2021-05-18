@@ -8,7 +8,7 @@ public:
 	Date();
 	Date(int, int, int);
 	void display_date();
+
 	bool operator < (const Date& d);
 	bool operator == (const Date& d);
 };
-

@@ -97,7 +97,15 @@ bool MANAGEMENT_SYSTEM::Check_Password()
 	} while (true);
 }
 
-//main
+inline void MANAGEMENT_SYSTEM::input_string(string& s)
+{
+	char new_s;
+	new_s = cin.get();
+	while ((new_s = cin.get()) != '\n')
+		s.push_back(new_s);
+}
+
+//main menu
 void MANAGEMENT_SYSTEM::run()
 {
 	cout << "Please choose:" << endl;
@@ -118,6 +126,10 @@ void MANAGEMENT_SYSTEM::run()
 		system("cls");
 		add_bill();
 		break;
+	case 3:
+		system("cls");
+		search_amend();
+		break;
 	case 5:
 		save();
 		exit(0);
@@ -132,12 +144,14 @@ inline void MANAGEMENT_SYSTEM::_return()
 	run();
 }
 
+//sub menu 1
 void MANAGEMENT_SYSTEM::info_manange()
 {
 	cout << "Please choose:" << endl;
 	cout << "1-Change Password" << endl;
 	cout << "2-Balance" << endl;
-	cout << "3-Return" << endl;
+	cout << "3-Print Account" << endl;
+	cout << "4-Return" << endl;
 	int opt1;
 	cin >> opt1;
 	string new_password;
@@ -164,6 +178,11 @@ void MANAGEMENT_SYSTEM::info_manange()
 		info_manange();
 		break;
 	case 3:
+		Check_Password();
+		personal_flow.print_all();
+		info_manange();
+		break;
+	case 4:
 		_return();
 		break;
 	default:
@@ -171,12 +190,13 @@ void MANAGEMENT_SYSTEM::info_manange()
 	}
 }
 
+//sub menu 2
 void MANAGEMENT_SYSTEM::add_bill()
 {
 	cout << "Please choose:" << endl;
 	cout << "1-Regular Bookkeeping" << endl;
 	cout << "2-Split the bill" << endl;
-	cout << "Caution: you may only split the bill of the latest three days!" << endl;
+	cout << "Caution: you can only split the bill of the latest month!" << endl;
 	cout << "3-Return" << endl;
 	int opt2;
 	cin >> opt2;
@@ -190,10 +210,7 @@ void MANAGEMENT_SYSTEM::add_bill()
 		cout << "When you paid the bill? (in the format of \"YY MM DD\")" << endl;
 		cin >> new_bill.date.yy >> new_bill.date.mm >> new_bill.date.dd;
 		cout << "Where did your money come from/go?" << endl;
-		char _source;
-		_source = cin.get();
-		while ((_source = cin.get()) != '\n')
-			new_bill.source.push_back(_source);
+		input_string(new_bill.source);
 		cout << "Please enter the amount: " << endl;
 		cin >> new_bill.money;
 		cout << "Please choose your payment method (see the user manual for more information):" << endl;
@@ -202,13 +219,26 @@ void MANAGEMENT_SYSTEM::add_bill()
 		cout << "Please add a tag: 0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other" << endl;
 		cin >> new_bill.tag_no;
 		cout << "Details(you may write anything!):" << endl;
-		char _detail;
-		_detail = cin.get();
-		while ((_detail = cin.get()) != '\n')
-			new_bill.detail.push_back(_detail);
+		input_string(new_bill.detail);
 		Check_Password();
 		personal_flow.add(new_bill);
 		cout << "Success!" << endl;
+		save();
+		add_bill();
+		break;
+
+	case 2:
+		if (personal_flow.show_latest_month() != 0)
+		{
+			cout << "Please enter the number of bill: " << endl;
+			int no;
+			cin >> no;
+			cout << "Please enter the number of people: " << endl;
+			int num;
+			cin >> num;
+			Check_Password();
+			personal_flow.split(no, num);
+		}
 		save();
 		add_bill();
 		break;
@@ -219,4 +249,91 @@ void MANAGEMENT_SYSTEM::add_bill()
 	default:
 		break;
 	}
+}
+
+//sub menu 3
+void MANAGEMENT_SYSTEM::search_amend()
+{
+	cout << "Please choose:" << endl;
+	cout << "1-Search by date" << endl;
+	cout << "2-Search by month" << endl;
+	cout << "3-Search by trading partners (latest month)" << endl;
+	cout << "4-Search by tags (latest month)" << endl;
+	cout << "5-Return" << endl;
+	int opt3;
+	cin >> opt3;
+	int y, m, d;
+	string s_input = "";
+	bool find = false;
+	switch (opt3)
+	{
+	case 1:
+		cout << "Please input the date you want to search (in the format \"YY MM DD\"):" << endl;
+		cin >> y >> m >> d;
+		Check_Password();
+		if (personal_flow.find_date(Date(y, m, d)))
+			find = true;
+		break;
+	case 2:
+		cout << "Please input the month you want to search (in the format \"YY MM\"):" << endl;
+		cin >> y >> m;
+		Check_Password();
+		if (personal_flow.find_month(Date(y, m, 0)))
+			find = true;
+		break;
+	case 3:
+		cout << "Pleae input the vendor you want to search:" << endl;
+		input_string(s_input);
+		if (personal_flow.find_source(s_input))
+			find = true;
+		break;
+	case 4:
+		cout << "Please input the tag you want to search:" << endl;
+		cout << "0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other" << endl;
+		cin >> y;
+		if (personal_flow.find_tag(y))
+			find = true;
+		break;
+	case 5:
+		_return();
+		break;
+	default:
+		break;
+	}
+
+	if (find)
+	{
+		cout << "Do you need to make any changes? 0-No\t1-Yes" << endl;
+		bool change;
+		cin >> change;
+		if (change)
+		{
+			cout << "Please enter the number of bill: " << endl;
+			int no;
+			cin >> no;
+			cout << "1-Change the tag" << endl;
+			cout << "2-Change the details" << endl;
+			int opt31;
+			cin >> opt31;
+			int _tag;
+			string _detail = "";
+			switch (opt31)
+			{
+			case 1:
+				cout << "Please add a new tag: 0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other" << endl;
+				cin >> _tag;
+				personal_flow.amend_tag(no, _tag);
+				break;
+			case 2:
+				cout << "Please rewrite the details:" << endl;
+				input_string(_detail);
+				personal_flow.amend_detail(no, _detail);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	save();
+	search_amend();
 }
