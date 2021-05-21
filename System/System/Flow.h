@@ -31,6 +31,8 @@ public:
 	void amend_detail(int, const string&);
 	void split(int, int);
 
+	void analysis(const Date&, const bool, const bool, const bool, const bool);
+
 	int get_Size();
 	double get_Balance();
 	void save(ofstream&);
@@ -43,9 +45,10 @@ private:
 	vector <Bill> flow;
 	double balance;
 	void display(vector<Bill>::iterator);
+	void print_to_file(ofstream&, vector<Bill>::iterator);
 	//after each new bill/amendment on date, sort by date (before->now)
 	void sort_date();
 	Date get_Today();
 	bool JudgeMonth(vector<Bill>::iterator);
-	
+	inline void display_total(ofstream&, double, double);
 };

@@ -22,5 +22,6 @@ private:
 	void info_manange();
 	void add_bill();
 	void search_amend();
+	void Analysis();
 };
 

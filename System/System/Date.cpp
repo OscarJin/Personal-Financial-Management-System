@@ -1,5 +1,6 @@
 #include "Date.h"
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 Date::Date()
@@ -12,6 +13,11 @@ Date::Date(int year, int month, int day): yy(year), mm(month), dd(day) { }
 void Date::display_date()
 {
 	cout << yy << "/" << mm << "/" << dd << endl;
+}
+
+void Date::display_date(ofstream& out)
+{
+	out << yy << "/" << mm << "/" << dd << endl;
 }
 
 bool Date::operator<(const Date& d)

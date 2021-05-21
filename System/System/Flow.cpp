@@ -16,7 +16,6 @@ Flow::Flow()
 
 void Flow::display(vector<Bill>::iterator it)
 {
-	cout << "NO." << it - flow.begin() + 1 << "\t";
 	if(it->io)
 		cout << "PAYMENT" << endl;
 	else
@@ -36,6 +35,27 @@ void Flow::display(vector<Bill>::iterator it)
 	cout << "DETAILS: " << it->detail << endl;
 }
 
+void Flow::print_to_file(ofstream& out, vector<Bill>::iterator it)
+{	
+	if (it->io)
+		out << "PAYMENT" << endl;
+	else
+		out << "INCOME" << endl;
+
+	out << "DATE:"; it->date.display_date(out);
+
+	if (it->io)
+		out << "TO: ";
+	else
+		out << "FROM: ";
+	out << it->source << endl;
+
+	out << "AMOUNT: CNY" << setiosflags(ios::fixed) << setprecision(2) << it->money << endl;
+	out << "PAYMENT METHOD: " << Payment_Method[it->method] << endl;
+	out << "TAG: " << Tag[it->tag_no] << endl;
+	out << "DETAILS: " << it->detail << endl;
+}
+
 inline void Flow::display_balance()
 {
 	cout << "BALANCE: CNY" << setiosflags(ios::fixed) << setprecision(2) << balance << endl;
@@ -45,6 +65,7 @@ void Flow::print_all()
 {
 	for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
 	{
+		cout << "NO." << it - flow.begin() + 1 << "\t";
 		display(it);
 		cout << endl;
 	}
@@ -221,4 +242,127 @@ bool Flow::JudgeMonth(vector<Bill>::iterator it)
 	if (it->date < Date(today.yy, today.mm - 1, 1))
 		return false;
 	return true;
+}
+
+inline void Flow::display_total(ofstream& output, double in, double out)
+{
+	output << "Total Income: CNY" << setiosflags(ios::fixed) << setprecision(2) << in << endl;
+	output << "Total Expenditure: CNY" << setiosflags(ios::fixed) << setprecision(2) << out << endl;
+}
+
+//financial analysis
+void Flow::analysis(const Date& target, const bool _total, const bool _tag, const bool _sort, const bool _all)
+{
+	ofstream output("analysis.txt", ios::out);
+	bool _head = false;
+	vector<Bill>::iterator it, head, tail;
+	double in_tot = 0;
+	double out_tot = 0;
+
+	//find head and tail
+	//total income and payment
+	for (it = flow.begin(); it != flow.end(); it++)
+	{
+		if ((it->date.yy == target.yy) && (it->date.mm == target.mm))
+		{
+			tail = it;
+			if (!_head)
+			{
+				_head = true;
+				head = it;
+			}
+			if (it->io)
+				out_tot += it->money;
+			else
+				in_tot += it->money;
+		}
+	}
+
+	if (!_head)
+	{
+		cout << "No result!" << endl;
+		return;
+	}
+
+	vector<Bill> tag_flow[7];
+	double tag_in[7];
+	double tag_out[7];
+	double tag_out_percent[7];
+	memset(tag_in, 0, sizeof(tag_in));
+	memset(tag_out, 0, sizeof(tag_out));
+	memset(tag_out_percent, 0, sizeof(tag_out_percent));
+	for (int i = 0; i < 7; i++)
+	{
+		for (it = head; it != tail + 1; it++)
+		{
+			if (it->tag_no == i)
+			{
+				tag_flow[i].push_back(*it);
+				if (it->io)
+					tag_out[i] += it->money;
+				else
+					tag_in[i] += it->money;
+			}
+		}
+		if (out_tot)
+			tag_out_percent[i] = tag_out[i] * 100 / out_tot;
+		else
+			tag_out_percent[i] = 0;
+		sort(tag_flow[i].begin(), tag_flow[i].end(), [](Bill b1, Bill b2) {return b1.money > b2.money; });
+	}
+
+	cout << "Personal Financial Analysis Report" << endl;
+	if (_total)
+	{
+		output << "Total Income & Expenditure" << endl;
+		display_total(output, in_tot, out_tot);
+		output << endl;
+	}
+
+	if (_tag)
+	{
+		output << "Analyse by Tag" << endl;
+		for (int i = 0; i < 7; i++)
+		{
+			output << "Tag: " << Tag[i] << endl;
+			display_total(output, tag_in[i], tag_out[i]);
+			output << "Percentage: " << setiosflags(ios::fixed) << setprecision(2) << tag_out_percent[i] << "\%" << endl;
+			output << endl;
+		}
+	}
+
+	if (_sort)
+	{
+		output << "Sort Bills of Each Tag" << endl;
+		for (int i = 0; i < 7; i++)
+		{
+			if (!tag_flow[i].size())
+				continue;
+			output << "Tag: " << Tag[i] << endl;
+			for (it = tag_flow[i].begin(); it != tag_flow[i].end(); it++)
+			{
+				print_to_file(output, it);
+				output << endl;
+			}
+			output << endl;
+		}
+	}
+	
+	if (_all)
+	{
+		output << "Print All Bills in the Month:" << endl;
+		int res = 0;
+		for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
+		{
+			if ((it->date.yy == target.yy) && (it->date.mm == target.mm))
+			{
+				res++;
+				output << "NO." << it - flow.begin() + 1 << "\t";
+				print_to_file(output, it);
+			}
+		}
+		output << "There are " << res << " result(s)." << endl;
+	}
+
+	cout << "Success! See \"analysis.txt\" in your folder!" << endl;
 }

@@ -81,6 +81,7 @@ void MANAGEMENT_SYSTEM::save()
 MANAGEMENT_SYSTEM::~MANAGEMENT_SYSTEM()
 {
 	save();
+	cout << "GOODBYE!" << endl;
 }
 
 bool MANAGEMENT_SYSTEM::Check_Password()
@@ -130,8 +131,13 @@ void MANAGEMENT_SYSTEM::run()
 		system("cls");
 		search_amend();
 		break;
+	case 4:
+		system("cls");
+		Analysis();
+		break;
 	case 5:
 		save();
+		cout << "GOODBYE!" << endl;
 		exit(0);
 	default:
 		break;
@@ -257,7 +263,7 @@ void MANAGEMENT_SYSTEM::search_amend()
 	cout << "Please choose:" << endl;
 	cout << "1-Search by date" << endl;
 	cout << "2-Search by month" << endl;
-	cout << "3-Search by trading partners (latest month)" << endl;
+	cout << "3-Search by vendors (latest month)" << endl;
 	cout << "4-Search by tags (latest month)" << endl;
 	cout << "5-Return" << endl;
 	int opt3;
@@ -268,21 +274,21 @@ void MANAGEMENT_SYSTEM::search_amend()
 	switch (opt3)
 	{
 	case 1:
-		cout << "Please input the date you want to search (in the format \"YY MM DD\"):" << endl;
+		cout << "Please enter the date you want to search (in the format \"YY MM DD\"):" << endl;
 		cin >> y >> m >> d;
 		Check_Password();
 		if (personal_flow.find_date(Date(y, m, d)))
 			find = true;
 		break;
 	case 2:
-		cout << "Please input the month you want to search (in the format \"YY MM\"):" << endl;
+		cout << "Please enter the month you want to search (in the format \"YY MM\"):" << endl;
 		cin >> y >> m;
 		Check_Password();
 		if (personal_flow.find_month(Date(y, m, 0)))
 			find = true;
 		break;
 	case 3:
-		cout << "Pleae input the vendor you want to search:" << endl;
+		cout << "Pleae enter the vendor you want to search:" << endl;
 		input_string(s_input);
 		if (personal_flow.find_source(s_input))
 			find = true;
@@ -336,4 +342,30 @@ void MANAGEMENT_SYSTEM::search_amend()
 	}
 	save();
 	search_amend();
+}
+
+void MANAGEMENT_SYSTEM::Analysis()
+{
+	//config
+	cout << "Welcome to Financial Analysis System!" << endl;
+	int y, m;
+	cout << "Please enter the month you want to analysis (in the format \"YY MM\"):" << endl;
+	cin >> y >> m;
+	cout << "Total income/expenditure? 0-No\t1-Yes" << endl;
+	bool _total;
+	cin >> _total;
+	cout << "Analyse by tag? 0-No\t1-Yes" << endl;
+	bool _tag;
+	cin >> _tag;
+	cout << "Sort bills of each tag? 0-No\t1-Yes" << endl;
+	bool _sort;
+	cin >> _sort;
+	cout << "Account in detail? 0-No\t1-Yes" << endl;
+	bool _all;
+	cin >> _all;
+	Check_Password();
+	personal_flow.analysis(Date(y, m, 0), _total, _tag, _sort, _all);
+	
+	system("pause");
+	_return();
 }
