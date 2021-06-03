@@ -62,10 +62,3 @@ string Info::get_Password()
 {
 	return password;
 }
-
-#if 0
-void Info::display()
-{
-	cout << password << endl;
-}
-#endif

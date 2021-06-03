@@ -5,8 +5,8 @@
 #include <iomanip>
 using namespace std;
 
-const string Flow::Payment_Method[5] = { "CREDIT CARD", "DEBIT CARD", "WECHAT PAY", "ALIPAY", "CASH" };
-const string Flow::Tag[7] = { "INCOME", "FOOD", "DAILY NECESSITIES", "EDUCATION", "ENTERTAINMENT", "TRANSPORTATION", "OTHER" };
+const string Flow::Payment_Method[6] = { "CREDIT CARD", "DEBIT CARD", "WECHAT PAY", "ALIPAY", "CASH", "STUDENT CARD"};
+const string Flow::Tag[7] = { "INCOME", "FOOD", "DAILY NECESSITIES", "EDUCATION", "ENTERTAINMENT", "TRANSPORTATION", "OTHER"};
 
 //NOTE: NO. DISPLAYED IS REAL+1!!!
 Flow::Flow()
@@ -36,7 +36,7 @@ void Flow::display(vector<Bill>::iterator it)
 }
 
 void Flow::print_to_file(ofstream& out, vector<Bill>::iterator it)
-{	
+{
 	if (it->io)
 		out << "PAYMENT" << endl;
 	else
@@ -54,6 +54,7 @@ void Flow::print_to_file(ofstream& out, vector<Bill>::iterator it)
 	out << "PAYMENT METHOD: " << Payment_Method[it->method] << endl;
 	out << "TAG: " << Tag[it->tag_no] << endl;
 	out << "DETAILS: " << it->detail << endl;
+	out << endl;
 }
 
 inline void Flow::display_balance()
@@ -63,11 +64,18 @@ inline void Flow::display_balance()
 
 void Flow::print_all()
 {
-	for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
+	if (flow.size())
 	{
-		cout << "NO." << it - flow.begin() + 1 << "\t";
-		display(it);
-		cout << endl;
+		for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
+		{
+			cout << "NO." << it - flow.begin() + 1 << "\t";
+			display(it);
+			cout << endl;
+		}
+	}
+	else
+	{
+		cout << "No record!" << endl;
 	}
 }
 
@@ -78,11 +86,16 @@ void Flow::sort_date()
 
 void Flow::add(const Bill& b)
 {
-	flow.push_back(b);
 	if (b.io)
 		balance -= b.money;
 	else
 		balance += b.money;
+	if (balance <= 0)			//insufficient balance!
+	{
+		balance += b.money;
+		throw balance;
+	}
+	flow.push_back(b);
 	display(flow.end() - 1);
 	display_balance();
 	sort_date();
@@ -91,13 +104,16 @@ void Flow::add(const Bill& b)
 int Flow::find_date(const Date& d)
 {
 	int res = 0;
-	
-	for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
+	if (flow.size())
 	{
-		if (it->date == d)
+		for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
 		{
-			res++;
-			display(it);
+			if (it->date == d)
+			{
+				res++;
+				cout << "NO." << it - flow.begin() + 1 << "\t";
+				display(it);
+			}
 		}
 	}
 	cout << "There are " << res << " result(s)." << endl;
@@ -108,12 +124,16 @@ int Flow::find_date(const Date& d)
 int Flow::find_month(const Date& d)
 {
 	int res = 0;
-	for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
+	if (flow.size())
 	{
-		if ((it->date.yy == d.yy) && (it->date.mm == d.mm))
+		for (vector<Bill>::iterator it = flow.begin(); it != flow.end(); it++)
 		{
-			res++;
-			display(it);
+			if ((it->date.yy == d.yy) && (it->date.mm == d.mm))
+			{
+				res++;
+				cout << "NO." << it - flow.begin() + 1 << "\t";
+				display(it);
+			}
 		}
 	}
 	cout << "There are " << res << " result(s)." << endl;
@@ -124,18 +144,21 @@ int Flow::find_month(const Date& d)
 int Flow::find_source(const string& source)
 {
 	int res = 0;
-
-	for (vector<Bill>::iterator it = flow.end() - 1; it != flow.begin(); it--)
+	if (flow.size())
 	{
-		if (!JudgeMonth(it))
-			break;
-		//judge latest month
-		if (it->source == source)
+		for (vector<Bill>::iterator it = flow.end() - 1; it != flow.begin(); it--)
 		{
-			res++;
-			display(it);
+			if (!JudgeMonth(it))
+				break;
+			//judge latest month
+			if (it->source == source)
+			{
+				res++;
+				cout << "NO." << it - flow.begin() + 1 << "\t";
+				display(it);
+			}
 		}
-	}
+	}	
 	cout << "There are " << res << " result(s)." << endl;
 	return res;
 }
@@ -143,16 +166,19 @@ int Flow::find_source(const string& source)
 int Flow::find_tag(int t)
 {
 	int res = 0;
-
-	for (vector<Bill>::iterator it = flow.end() - 1; it != flow.begin(); it--)
+	if (flow.size())
 	{
-		if (!JudgeMonth(it))
-			break;
-		//judge latest month
-		if (it->tag_no == t)
+		for (vector<Bill>::iterator it = flow.end() - 1; it != flow.begin(); it--)
 		{
-			res++;
-			display(it);
+			if (!JudgeMonth(it))
+				break;
+			//judge latest month
+			if (it->tag_no == t)
+			{
+				res++;
+				cout << "NO." << it - flow.begin() + 1 << "\t";
+				display(it);
+			}
 		}
 	}
 	cout << "There are " << res << " result(s)." << endl;
@@ -163,16 +189,19 @@ int Flow::find_tag(int t)
 int Flow::show_latest_month()
 {
 	int res = 0;
-
-	for (vector<Bill>::iterator it = flow.end() - 1; it != flow.begin(); it--)
+	if (flow.size())
 	{
-		if (!JudgeMonth(it))
-			break;
-		//judge latest month
-		if (it->io == 1)
+		for (vector<Bill>::iterator it = flow.end() - 1; it != flow.begin(); it--)
 		{
-			res++;
-			display(it);
+			if (!JudgeMonth(it))
+				break;
+			//judge latest month
+			if (it->io == 1)
+			{
+				res++;
+				cout << "NO." << it - flow.begin() + 1 << "\t";
+				display(it);
+			}
 		}
 	}
 	cout << "There are " << res << " result(s)." << endl;
@@ -181,6 +210,10 @@ int Flow::show_latest_month()
 
 void Flow::amend_tag(int i, int new_tag)
 {
+	if (i <= 0 || i > flow.size())
+		throw i;
+	if (new_tag < 0 || new_tag>6)
+		throw new_tag;
 	flow[i - 1].tag_no = new_tag;
 	cout << "Success!" << endl;
 }
@@ -193,8 +226,11 @@ void Flow::amend_detail(int i, const string& new_detail)
 
 void Flow::split(int no, int num)
 {
+	balance -= flow[no - 1].money;
 	flow[no - 1].money /= num;
+	balance += flow[no - 1].money;
 	cout << "Success!" << endl;
+	display(flow.begin() + no - 1);
 }
 
 int Flow::get_Size()
@@ -311,7 +347,7 @@ void Flow::analysis(const Date& target, const bool _total, const bool _tag, cons
 		sort(tag_flow[i].begin(), tag_flow[i].end(), [](Bill b1, Bill b2) {return b1.money > b2.money; });
 	}
 
-	cout << "Personal Financial Analysis Report" << endl;
+	output << "Personal Financial Analysis Report" << endl;
 	if (_total)
 	{
 		output << "Total Income & Expenditure" << endl;
@@ -357,7 +393,6 @@ void Flow::analysis(const Date& target, const bool _total, const bool _tag, cons
 			if ((it->date.yy == target.yy) && (it->date.mm == target.mm))
 			{
 				res++;
-				output << "NO." << it - flow.begin() + 1 << "\t";
 				print_to_file(output, it);
 			}
 		}

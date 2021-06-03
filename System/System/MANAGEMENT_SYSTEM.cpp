@@ -4,11 +4,12 @@
 #include <string>
 #include <cstdio>
 #include <cstdlib>
+#include <conio.h>
 using namespace std;
 
 MANAGEMENT_SYSTEM::MANAGEMENT_SYSTEM()
 {
-	ifstream history("history.txt", ios::in);
+	ifstream history("history.dat", ios::in);
 	if (!history)
 		init();
 	else
@@ -58,9 +59,10 @@ void MANAGEMENT_SYSTEM::init()
 	do
 	{
 		cout << "Now please enter your password: " << endl;
-		cin >> new_password;
+		new_password = password_input();
 		if (personal_info.change(new_password))
 		{
+			Check_Password();
 			cout << "Congratulations! You have set up your password!" << endl;
 			break;
 		}
@@ -70,8 +72,8 @@ void MANAGEMENT_SYSTEM::init()
 
 void MANAGEMENT_SYSTEM::save()
 {
-	remove("history.txt");
-	ofstream record("history.txt", ios::out);				//cover old history
+	remove("history.dat");
+	ofstream record("history.dat", ios::out);				//cover old history
 	record << personal_info.get_Password() << endl;			//write password
 	record << personal_flow.get_Size() << endl;				//write num of bills
 	personal_flow.save(record);
@@ -86,15 +88,15 @@ MANAGEMENT_SYSTEM::~MANAGEMENT_SYSTEM()
 
 bool MANAGEMENT_SYSTEM::Check_Password()
 {
-	string password_input;
+	string input = "";
 	do
 	{
 		cout << "Please enter your password:" << endl;
-		cin >> password_input;
-		if (personal_info.check(password_input))
+		input = password_input();
+		if (personal_info.check(input))
 			return true;
 		else
-			cout << "Password Incorrect" << endl;
+			cout << "Password Incorrect!" << endl;
 	} while (true);
 }
 
@@ -104,6 +106,22 @@ inline void MANAGEMENT_SYSTEM::input_string(string& s)
 	new_s = cin.get();
 	while ((new_s = cin.get()) != '\n')
 		s.push_back(new_s);
+}
+
+inline string MANAGEMENT_SYSTEM::password_input()
+{
+	string input = "";
+	while (true) {
+		char c = _getch();
+		if (c == '\r')
+		{
+			cout << endl;
+			break;
+		}
+		input.push_back(c);
+		cout << "*";
+	}
+	return input;
 }
 
 //main menu
@@ -125,7 +143,18 @@ void MANAGEMENT_SYSTEM::run()
 		break;
 	case 2:
 		system("cls");
-		add_bill();
+		try
+		{
+			add_bill();
+		}
+		catch (double money)
+		{
+			cout << money << " is an invalid input!" << endl;
+		}
+		catch (int choice)
+		{
+			cout << choice << " is an invalid input!" << endl;
+		}
 		break;
 	case 3:
 		system("cls");
@@ -144,6 +173,7 @@ void MANAGEMENT_SYSTEM::run()
 	}
 }
 
+//return to main menu
 inline void MANAGEMENT_SYSTEM::_return()
 {
 	system("cls");
@@ -168,9 +198,10 @@ void MANAGEMENT_SYSTEM::info_manange()
 		do
 		{
 			cout << "Please enter your new password: " << endl;
-			cin >> new_password;
+			new_password = password_input();
 			if (personal_info.change(new_password))
 			{
+				Check_Password();
 				cout << "Congratulations! You have changed your password!" << endl;
 				break;
 			}
@@ -219,22 +250,35 @@ void MANAGEMENT_SYSTEM::add_bill()
 		input_string(new_bill.source);
 		cout << "Please enter the amount: " << endl;
 		cin >> new_bill.money;
+		if (new_bill.money <= 0)
+			throw new_bill.money;		//money should > 0
 		cout << "Please choose your payment method (see the user manual for more information):" << endl;
-		cout << "0-Credit Card\t1-Debit Card\t2-Wechat Pay\t3-Alipay\t4-Cash" << endl;
+		cout << "0-Credit Card\t1-Debit Card\t2-Wechat Pay\t3-Alipay\t4-Cash\t5-Student Card" << endl;
 		cin >> new_bill.method;
+		if (new_bill.method < 0 || new_bill.method > 5)
+			throw new_bill.method;		//invalid method input
 		cout << "Please add a tag: 0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other" << endl;
 		cin >> new_bill.tag_no;
+		if (new_bill.tag_no < 0 || new_bill.tag_no > 6)
+			throw new_bill.tag_no;		//invalid tag input
 		cout << "Details(you may write anything!):" << endl;
 		input_string(new_bill.detail);
 		Check_Password();
-		personal_flow.add(new_bill);
-		cout << "Success!" << endl;
+		try
+		{
+			personal_flow.add(new_bill);
+			cout << "Success!" << endl;
+		}
+		catch (double balance)
+		{
+			cout << "Insufficient Balance!" << endl;
+		}
 		save();
 		add_bill();
 		break;
 
 	case 2:
-		if (personal_flow.show_latest_month() != 0)
+		if (personal_flow.show_latest_month())
 		{
 			cout << "Please enter the number of bill: " << endl;
 			int no;
@@ -290,6 +334,7 @@ void MANAGEMENT_SYSTEM::search_amend()
 	case 3:
 		cout << "Pleae enter the vendor you want to search:" << endl;
 		input_string(s_input);
+		Check_Password();
 		if (personal_flow.find_source(s_input))
 			find = true;
 		break;
@@ -297,6 +342,7 @@ void MANAGEMENT_SYSTEM::search_amend()
 		cout << "Please input the tag you want to search:" << endl;
 		cout << "0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other" << endl;
 		cin >> y;
+		Check_Password();
 		if (personal_flow.find_tag(y))
 			find = true;
 		break;
@@ -328,11 +374,20 @@ void MANAGEMENT_SYSTEM::search_amend()
 			case 1:
 				cout << "Please add a new tag: 0-Income 1-Food 2-Daily Necessities 3-Education 4-Entertainment 5-Transportation 6-Other" << endl;
 				cin >> _tag;
-				personal_flow.amend_tag(no, _tag);
+				Check_Password();
+				try
+				{
+					personal_flow.amend_tag(no, _tag);
+				}
+				catch (int i)
+				{
+					cout << "Invalid input!" << endl;
+				}
 				break;
 			case 2:
 				cout << "Please rewrite the details:" << endl;
 				input_string(_detail);
+				Check_Password();
 				personal_flow.amend_detail(no, _detail);
 				break;
 			default:
@@ -344,6 +399,7 @@ void MANAGEMENT_SYSTEM::search_amend()
 	search_amend();
 }
 
+//sub menu 4
 void MANAGEMENT_SYSTEM::Analysis()
 {
 	//config

@@ -15,6 +15,7 @@ private:
 	Flow personal_flow;
 	bool Check_Password();
 	inline void input_string(string&);
+	inline string password_input();
 	void init();
 	void save();
 

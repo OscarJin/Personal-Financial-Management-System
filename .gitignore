@@ -5,6 +5,7 @@
 
 #Self-define
 *.txt
+*.dat
 
 # User-specific files
 *.rsuser
