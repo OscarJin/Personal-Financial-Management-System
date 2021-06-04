@@ -287,7 +287,14 @@ void MANAGEMENT_SYSTEM::add_bill()
 			int num;
 			cin >> num;
 			Check_Password();
-			personal_flow.split(no, num);
+			try
+			{
+				personal_flow.split(no, num);
+			}
+			catch (int num)
+			{
+				cout << num << " is an invalid input!" << endl;
+			}
 		}
 		save();
 		add_bill();

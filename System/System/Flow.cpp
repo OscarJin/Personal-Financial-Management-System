@@ -216,16 +216,20 @@ void Flow::amend_tag(int i, int new_tag)
 		throw new_tag;
 	flow[i - 1].tag_no = new_tag;
 	cout << "Success!" << endl;
+	display(flow.begin() + i - 1);
 }
 
 void Flow::amend_detail(int i, const string& new_detail)
 {
 	flow[i - 1].detail = new_detail;
 	cout << "Success!" << endl;
+	display(flow.begin() + i - 1);
 }
 
 void Flow::split(int no, int num)
 {
+	if (num <= 0)
+		throw num;
 	balance -= flow[no - 1].money;
 	flow[no - 1].money /= num;
 	balance += flow[no - 1].money;
