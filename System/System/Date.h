@@ -10,8 +10,8 @@ public:
 	int dd;
 	Date();
 	Date(int, int, int);
-	void display_date();
-	void display_date(ofstream&);
+	void display_date();			// YY/MM/DD
+	void display_date(ofstream&);	//same to file
 
 	bool operator < (const Date& d);
 	bool operator == (const Date& d);

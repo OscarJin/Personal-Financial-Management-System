@@ -80,6 +80,12 @@ void MANAGEMENT_SYSTEM::save()
 	record.close();
 }
 
+template<class T>
+inline void MANAGEMENT_SYSTEM::error(T e)
+{
+	cout << e << "is an invalid input!" << endl;
+}
+
 MANAGEMENT_SYSTEM::~MANAGEMENT_SYSTEM()
 {
 	save();
@@ -149,16 +155,23 @@ void MANAGEMENT_SYSTEM::run()
 		}
 		catch (double money)
 		{
-			cout << money << " is an invalid input!" << endl;
+			error(money);
 		}
 		catch (int choice)
 		{
-			cout << choice << " is an invalid input!" << endl;
+			error(choice);
 		}
 		break;
 	case 3:
 		system("cls");
-		search_amend();
+		try
+		{
+			search_amend();
+		}
+		catch (int change)
+		{
+			error(change);
+		}
 		break;
 	case 4:
 		system("cls");
@@ -180,7 +193,7 @@ inline void MANAGEMENT_SYSTEM::_return()
 	run();
 }
 
-//sub menu 1
+//menu 1
 void MANAGEMENT_SYSTEM::info_manange()
 {
 	cout << "Please choose:" << endl;
@@ -227,7 +240,7 @@ void MANAGEMENT_SYSTEM::info_manange()
 	}
 }
 
-//sub menu 2
+//menu 2
 void MANAGEMENT_SYSTEM::add_bill()
 {
 	cout << "Please choose:" << endl;
@@ -293,7 +306,7 @@ void MANAGEMENT_SYSTEM::add_bill()
 			}
 			catch (int num)
 			{
-				cout << num << " is an invalid input!" << endl;
+				error(num);
 			}
 		}
 		save();
@@ -308,7 +321,7 @@ void MANAGEMENT_SYSTEM::add_bill()
 	}
 }
 
-//sub menu 3
+//menu 3
 void MANAGEMENT_SYSTEM::search_amend()
 {
 	cout << "Please choose:" << endl;
@@ -363,8 +376,10 @@ void MANAGEMENT_SYSTEM::search_amend()
 	if (find)
 	{
 		cout << "Do you need to make any changes? 0-No\t1-Yes" << endl;
-		bool change;
+		int change;
 		cin >> change;
+		if (change != 0 && change != 1)
+			throw change;
 		if (change)
 		{
 			cout << "Please enter the number of bill: " << endl;
@@ -388,7 +403,7 @@ void MANAGEMENT_SYSTEM::search_amend()
 				}
 				catch (int i)
 				{
-					cout << "Invalid input!" << endl;
+					error(i);
 				}
 				break;
 			case 2:
@@ -406,7 +421,7 @@ void MANAGEMENT_SYSTEM::search_amend()
 	search_amend();
 }
 
-//sub menu 4
+//menu 4
 void MANAGEMENT_SYSTEM::Analysis()
 {
 	//config
